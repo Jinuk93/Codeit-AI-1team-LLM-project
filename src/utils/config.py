@@ -58,14 +58,21 @@ class Config:
         self.USE_MODEL_HUB = os.getenv("USE_MODEL_HUB", "true").lower() == "true"
         
         # Hugging Face Model Hub 설정
-        self.MODEL_HUB_REPO = os.getenv("MODEL_HUB_REPO", "beomi/Llama-3-Open-Ko-8B-gguf")
-        self.MODEL_HUB_FILENAME = os.getenv("MODEL_HUB_FILENAME", "ggml-model-Q4_K_M.gguf")
+        # Llama-3-Open-Ko-8B 한국어 GGUF 모델 사용
+        self.MODEL_HUB_REPO = os.getenv(
+            "MODEL_HUB_REPO", 
+            "Dongjin1203/RFP_Documents_chatbot"
+        )
+        self.MODEL_HUB_FILENAME = os.getenv(
+            "MODEL_HUB_FILENAME", 
+            "Llama-3-Open-Ko-8B.Q4_K_M.gguf"
+        )
         self.MODEL_CACHE_DIR = os.getenv("MODEL_CACHE_DIR", ".cache/models")
         
         # 로컬 경로 (USE_MODEL_HUB=false인 경우)
-        self.GGUF_MODEL_PATH = os.getenv("GGUF_MODEL_PATH", ".cache/models/llama-3-ko-8b-Q4_K_M.gguf")
+        self.GGUF_MODEL_PATH = os.getenv("GGUF_MODEL_PATH", ".cache/models/Llama-3-Open-Ko-8B.Q4_K_M.gguf")
         
-        # GGUF GPU 설정 (T4 Medium 최적화)
+        # GGUF GPU 설정 (T4 Medium 최적화 - 8B 모델용)
         self.GGUF_N_GPU_LAYERS = int(os.getenv("GGUF_N_GPU_LAYERS", "35"))  # T4에서 8B 모델 전체를 GPU에 로드
         self.GGUF_N_CTX = int(os.getenv("GGUF_N_CTX", "2048"))              # 컨텍스트 길이
         self.GGUF_N_THREADS = int(os.getenv("GGUF_N_THREADS", "4"))         # CPU 스레드 (GPU 사용 시 낮게)
