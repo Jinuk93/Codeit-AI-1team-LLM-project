@@ -18,15 +18,15 @@ class Config:
         self.BASE_FOLDER_PATH = "./data/files/"
         self.OUTPUT_CHUNKS_PATH = "./data/rag_chunks_final.csv"
         
-        # RAG
+        # RAG - 환경변수 우선, 없으면 기본값
         self.RAG_INPUT_PATH = "./data/rag_chunks_final.csv"
-        self.DB_DIRECTORY = "./chroma_db"
+        self.DB_DIRECTORY = os.getenv("CHROMA_DB_PATH", "./chroma_db")
         
         # ===== 전처리 설정 =====
         self.CHUNK_SIZE = 1000
         self.CHUNK_OVERLAP = 200
         self.SEPARATORS = ["\n\n", "\n", " ", ""]
-        self.MIN_TEXT_LENGTH = 100  # 최소 텍스트 길이
+        self.MIN_TEXT_LENGTH = 100
         
         # ===== 임베딩 설정 =====
         self.EMBEDDING_MODEL_NAME = "text-embedding-3-small"
@@ -42,45 +42,16 @@ class Config:
         
         # ===== 검색 설정 =====
         self.DEFAULT_TOP_K = 10
-        self.DEFAULT_ALPHA = 0.5  # Hybrid Search 가중치
+        self.DEFAULT_ALPHA = 0.5
         self.DEFAULT_SEARCH_MODE = "hybrid_rerank"
         
         # ===== LLM 설정 =====
-        self.LLM_MODEL_NAME = "gpt-5-mini"
+        self.LLM_MODEL_NAME = "gpt-4o-mini"
         self.DEFAULT_TEMPERATURE = 0.0
         self.DEFAULT_MAX_TOKENS = 1000
-
-        # ========== GGUF 모델 설정 (신규) ==========
-        self.GGUF_MODEL_PATH = "./models/Llama-3-Open-Ko-8B.Q4_K_M.gguf"
-        self.GGUF_N_GPU_LAYERS = 35  # GPU에 올릴 레이어 수 (0 = CPU만, 35 = 전체)
-        self.GGUF_N_CTX = 16384  # 컨텍스트 길이
-        self.GGUF_N_THREADS = 8  # CPU 스레드 수
-        
-        self.GGUF_MAX_NEW_TOKENS = 512
-        self.GGUF_TEMPERATURE = 0.5
-        self.GGUF_TOP_P = 0.9
-
-        # ========== Model Hub 설정 (신규) ==========
-        # Hugging Face Spaces 배포 시 True로 설정
-        self.USE_MODEL_HUB = os.getenv("USE_MODEL_HUB", "false").lower() == "true"
-        
-        # Model Hub 레포 정보
-        self.MODEL_HUB_REPO = "Dongjin1203/RFP_Documents_chatbot"  # 실제 레포명으로 변경 필요
-        self.MODEL_HUB_FILENAME = "Llama-3-Open-Ko-8B.Q4_K_M.gguf"
-        
-        # 다운로드 캐시 디렉토리
-        self.MODEL_CACHE_DIR = "./models"        
         
         # 시스템 프롬프트
         self.SYSTEM_PROMPT = "당신은 RFP(제안요청서) 분석 및 요약 전문가입니다."
-
-    def validate_gguf(self):
-        """GGUF 모델 설정 유효성 검사"""
-        if not os.path.exists(self.GGUF_MODEL_PATH):
-            raise FileNotFoundError(
-                f"GGUF 모델 파일을 찾을 수 없습니다: {self.GGUF_MODEL_PATH}"
-            )
-        return True
 
     def _get_api_key(self) -> str:
         """환경변수에서 API 키 로드"""
@@ -106,7 +77,6 @@ class Config:
                 f"파일 폴더를 찾을 수 없습니다: {self.BASE_FOLDER_PATH}"
             )
         
-        # 출력 폴더 생성
         output_dir = os.path.dirname(self.OUTPUT_CHUNKS_PATH)
         if output_dir:
             os.makedirs(output_dir, exist_ok=True)
@@ -117,11 +87,6 @@ class Config:
         """RAG 설정 유효성 검사"""
         if not self.OPENAI_API_KEY:
             raise ValueError("OPENAI_API_KEY가 설정되지 않았습니다")
-        
-        if not os.path.exists(self.RAG_INPUT_PATH):
-            raise FileNotFoundError(
-                f"입력 파일을 찾을 수 없습니다: {self.RAG_INPUT_PATH}"
-            )
         
         return True
 
@@ -135,43 +100,7 @@ class Config:
         """설정 유효성 검사 (하위 호환성)"""
         return self.validate_preprocess()
 
-    def __repr__(self):
-        """설정 정보 출력"""
-        return f"""
-Config 설정:
-  [경로]
-  - 메타 CSV: {self.META_CSV_PATH}
-  - 파일 폴더: {self.BASE_FOLDER_PATH}
-  - 청크 출력: {self.OUTPUT_CHUNKS_PATH}
-  - DB 경로: {self.DB_DIRECTORY}
-  - 어댑터 경로: {self.FINETUNED_ADAPTER_PATH}
-  
-  [전처리]
-  - 청크 크기: {self.CHUNK_SIZE}
-  - 청크 오버랩: {self.CHUNK_OVERLAP}
-  
-  [모델]
-  - 임베딩: {self.EMBEDDING_MODEL_NAME}
-  - LLM: {self.LLM_MODEL_NAME}
-  - Fine-tuned: {self.FINETUNED_BASE_MODEL}
-  
-  [검색]
-  - Top-K: {self.DEFAULT_TOP_K}
-  - Alpha: {self.DEFAULT_ALPHA}
-  - 모드: {self.DEFAULT_SEARCH_MODE}
-  
-  [생성]
-  - Temperature: {self.FINETUNED_TEMPERATURE}
-  - Max Tokens: {self.FINETUNED_MAX_NEW_TOKENS}
-"""
-
 
 # 하위 호환성을 위한 별칭
 PreprocessConfig = Config
 RAGConfig = Config
-
-
-# 테스트용
-if __name__ == "__main__":
-    config = Config()
-    print(config)

@@ -20,6 +20,7 @@ ENV HUGGINGFACE_HUB_CACHE=/app/.cache/huggingface/hub
 ENV OMP_NUM_THREADS=1
 ENV MKL_NUM_THREADS=1
 ENV NUMEXPR_NUM_THREADS=1
+ENV CHROMA_DB_PATH=/app/.cache/chroma_db
 
 # 캐시 디렉토리 생성 및 권한 설정
 RUN mkdir -p /app/.cache/huggingface /app/.streamlit && \
@@ -35,12 +36,11 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
 # 프로젝트 파일 복사
 COPY . .
 
+# 시작 스크립트 실행 권한 부여
+RUN chmod +x /app/start.sh
+
 # Streamlit 포트
 EXPOSE 7860
 
-# 실행
-CMD ["streamlit", "run", "src/visualization/chatbot_app.py", \
-     "--server.port=7860", \
-     "--server.address=0.0.0.0", \
-     "--server.headless=true", \
-     "--server.fileWatcherType=none"]
+# 시작 스크립트 실행
+CMD ["/app/start.sh"]
