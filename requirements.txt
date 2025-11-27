@@ -1,13 +1,13 @@
 # ===== LangChain 생태계 =====
-langchain==0.2.16
-langchain-core==0.2.38
-langchain-text-splitters==0.2.4
-langchain-openai==0.1.23
+langchain==0.2.11
+langchain-core==0.2.23
+langchain-text-splitters==0.2.2
+langchain-openai==0.1.20
 langchain-chroma==0.1.2
-langchain-community==0.2.16
+langchain-community==0.2.10
 
 # ===== OpenAI API =====
-openai==1.40.0
+openai==1.35.13
 
 # ===== 벡터 DB =====
 chromadb==0.4.24
